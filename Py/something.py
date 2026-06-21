@@ -120,6 +120,7 @@ class ApiKeyPrompt(tk.Tk):
         prov_frame.grid(row=6, column=0, pady=(8, 8))
         tk.Radiobutton(prov_frame, text="OpenAI", variable=self.provider_var, value="openai", fg=FOREGROUND, bg=BACKGROUND, selectcolor=BACKGROUND, activebackground=BACKGROUND, font=self.small_font).pack(side="left", padx=8)
         tk.Radiobutton(prov_frame, text="Anthropic", variable=self.provider_var, value="anthropic", fg=FOREGROUND, bg=BACKGROUND, selectcolor=BACKGROUND, activebackground=BACKGROUND, font=self.small_font).pack(side="left", padx=8)
+        tk.Radiobutton(prov_frame, text="OpenRouter", variable=self.provider_var, value="openrouter", fg=FOREGROUND, bg=BACKGROUND, selectcolor=BACKGROUND, activebackground=BACKGROUND, font=self.small_font).pack(side="left", padx=8)
 
         # Next button
         self.next_button = tk.Button(
@@ -138,6 +139,23 @@ class ApiKeyPrompt(tk.Tk):
             cursor="hand2"
         )
         self.next_button.grid(row=7, column=0, padx=120, sticky="ew")
+        # Test key button
+        self.test_button = tk.Button(
+            self,
+            text="Test Key",
+            command=self.test_key,
+            fg=FOREGROUND,
+            bg="#FF6B6B",
+            activebackground="#E05555",
+            activeforeground=FOREGROUND,
+            font=self.small_font,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=6,
+            cursor="hand2"
+        )
+        self.test_button.grid(row=8, column=0, padx=160, pady=(8,0), sticky="ew")
 
     def on_submit(self):
         key = self.api_var.get().strip()
@@ -150,6 +168,36 @@ class ApiKeyPrompt(tk.Tk):
         # Open chat window and pass key/provider (kept in memory only)
         ChatWindow(self, api_key=key, provider=provider)
         self.withdraw()
+
+    def test_key(self):
+        key = self.api_var.get().strip()
+        if not key:
+            messagebox.showerror("No key", "Please enter an API key to test.")
+            return
+        provider = self.provider_var.get()
+        self.status.config(text="Testing key...")
+
+        def do_test():
+            try:
+                if provider == "openai":
+                    rcode, rtext = _test_openai_key(key)
+                elif provider == "anthropic":
+                    rcode, rtext = _test_anthropic_key(key)
+                else:
+                    rcode, rtext = _test_openrouter_key(key)
+                if rcode == 200 or rcode == 201:
+                    messagebox.showinfo("Key OK", f"Key is valid for {provider} (HTTP {rcode}).")
+                else:
+                    messagebox.showerror("Key Test Failed", f"HTTP {rcode}: {rtext}")
+            except Exception as e:
+                messagebox.showerror("Key Test Error", str(e))
+            finally:
+                try:
+                    self.status.config(text="")
+                except Exception:
+                    pass
+
+        threading.Thread(target=do_test, daemon=True).start()
 
 
 class ChatWindow(tk.Toplevel):
@@ -268,6 +316,65 @@ def call_anthropic(api_key, system_instruction, user_text):
     if "completions" in data and len(data["completions"])>0:
         return data["completions"][0].get("data", {}).get("text", "").strip()
     return json.dumps(data)
+
+
+def call_openrouter(api_key, system_instruction, user_text):
+    url = "https://api.openrouter.ai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    payload = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {"role": "system", "content": system_instruction},
+            {"role": "user", "content": user_text}
+        ],
+        "temperature": 0.2,
+        "max_tokens": 2000
+    }
+    r = requests.post(url, headers=headers, json=payload, timeout=60)
+    r.raise_for_status()
+    data = r.json()
+    if "choices" in data and len(data["choices"])>0:
+        return data["choices"][0].get("message", {}).get("content", "").strip()
+    return json.dumps(data)
+
+
+def _test_openai_key(key):
+    try:
+        r = requests.post(
+            "https://api.openai.com/v1/chat/completions",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={"model":"gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":3},
+            timeout=10
+        )
+        return r.status_code, r.text
+    except Exception as e:
+        return 0, str(e)
+
+
+def _test_anthropic_key(key):
+    try:
+        r = requests.post(
+            "https://api.anthropic.com/v1/complete",
+            headers={"x-api-key": key, "Content-Type": "application/json"},
+            json={"model":"claude-2.1","prompt":"ping\n\nAssistant:","max_tokens_to_sample":10},
+            timeout=10
+        )
+        return r.status_code, r.text
+    except Exception as e:
+        return 0, str(e)
+
+
+def _test_openrouter_key(key):
+    try:
+        r = requests.post(
+            "https://api.openrouter.ai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={"model":"gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":3},
+            timeout=10
+        )
+        return r.status_code, r.text
+    except Exception as e:
+        return 0, str(e)
 
 
 class SpecWindow(tk.Toplevel):
