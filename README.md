@@ -13,8 +13,19 @@ small experimental repo containing a LOT of random code so i can learn every lan
 
 ## Requirements
 
-- Python 3.11 - 3.14 with `requests` installed
+- Python 3.11 - 3.14
+	- `requests` (third-party) — used by `Py/something.py` for HTTP calls
+	- `tkinter` / Tcl/Tk (GUI) — usually included with standard Python on Windows/macOS; if missing, install the standard Python distribution from python.org or enable Tcl/Tk support.
+
 - Lua runtime for `lua/bob.lua`
+
+Install Python dependencies:
+
+```powershell
+pip install requests
+pip install tkinter
+pip install socket
+```
 
 ## Setup
 

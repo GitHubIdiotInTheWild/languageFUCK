@@ -1,11 +1,24 @@
+import sys
 import socket
-import tkinter as tk
-import tkinter.font as tkfont
-from tkinter import messagebox
-import tkinter.ttk as ttk
-import threading
-import requests
 import json
+import math
+import re
+import threading
+
+try:
+    import tkinter as tk
+    import tkinter.font as tkfont
+    from tkinter import messagebox
+    import tkinter.ttk as ttk
+except Exception:
+    print("Tkinter is not available. The GUI requires Tcl/Tk (install the standard Python distribution from python.org).", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    import requests
+except Exception:
+    print("Missing dependency: requests. Install with: py -m pip install requests", file=sys.stderr)
+    sys.exit(1)
 
 BACKGROUND = "#121212"
 FOREGROUND = "#E0E0E0"
