@@ -30,12 +30,16 @@ def is_pi_equation(text):
     if not left or not right:
         return False
 
-    expression = text.replace("^", "**")
-    allowed = {"pi": math.pi}
+    if "pi" in right:
+        return False
+
+    left = left.replace("^", "**")
+    right = right.replace("^", "**")
+    allowed_left = {"pi": math.pi}
 
     try:
-        left_value = eval(left, {"__builtins__": None}, allowed)
-        right_value = eval(right, {"__builtins__": None}, allowed)
+        left_value = eval(left, {"__builtins__": None}, allowed_left)
+        right_value = eval(right, {"__builtins__": None}, {})
     except Exception:
         return False
 
