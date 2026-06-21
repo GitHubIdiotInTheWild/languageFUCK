@@ -34,6 +34,14 @@ local function print_separator()
   print(string.rep("-", 40))
 end
 
+local function table_keys(t)
+  local keys = {}
+  for k, _ in pairs(t) do
+    table.insert(keys, k)
+  end
+  return keys
+end
+
 local function get_location()
   return locations[game.location]
 end
@@ -44,7 +52,7 @@ local function describe_location()
   print("📍 " .. loc.name)
   print(loc.description)
   print_separator()
-  print("Exits:", table.concat(vim.tbl_keys(loc.exits) or {}, ", "))
+  print("Exits:", table.concat(table_keys(loc.exits), ", "))
 end
 
 local function add_item(item_name)
