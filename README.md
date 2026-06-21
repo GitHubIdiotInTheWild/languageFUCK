@@ -1,10 +1,10 @@
 # languageFUCK
 
-`languageFUCK` is an experimental playground for learning programming by doing. Instead of building one big app, this repo collects a mix of small, fun projects and language experiments where each file shows a different idea or technique.
+`languageFUCK` is an experimental playground for learning programming by doing. instead of building one big app, this repo collects a mix of small, fun projects and language experiments where each file shows a different idea or technique.
 
-The goal is to make it easy to explore language features, GUI design, interpreter ideas, and tooling without having to start from scratch. You’ll find a local AI assistant UI, a Lua adventure game, language notes, and a few quirky demos that help keep the learning process playful.
+the goal? to make it easy to explore language features, GUI design, interpreter ideas, and tooling without having to start from scratch. You’ll find a local AI assistant UI, a Lua adventure game, language notes, and a few quirky demos that help keep the learning process playful.
 
-This repo is designed both as a personal scratchpad and as a lightweight learning resource: use it to test ideas, try out example code, and extend the parts you like.
+this repo is designed both as a personal scratchpad and as a lightweight learning resource: use it to test ideas, try out example code, and extend the parts you like.
 
 # languageFUCK's features
 
