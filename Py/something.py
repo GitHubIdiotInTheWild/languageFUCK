@@ -22,7 +22,7 @@ def _choose_font(size, weight="normal"):
 class ApiKeyPrompt(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Dark API Key Entry")
+        self.title("Coding Assistant")
         self.configure(bg=BACKGROUND)
         self.state("zoomed")
         self.resizable(False, False)
@@ -177,6 +177,13 @@ class ApiKeyPrompt(tk.Tk):
         provider = self.provider_var.get()
         self.status.config(text="Testing key...")
 
+        def _provider_hint(key, provider):
+            if provider == "openai" and key.startswith("sk-or-"):
+                return "This looks like an OpenRouter key, but OpenAI provider is selected. Switch to OpenRouter."
+            if provider == "openrouter" and key.startswith("sk-") and not key.startswith("sk-or-"):
+                return "This looks like an OpenAI key, but OpenRouter provider is selected. Switch to OpenAI."
+            return ""
+
         def do_test():
             try:
                 if provider == "openai":
@@ -185,10 +192,15 @@ class ApiKeyPrompt(tk.Tk):
                     rcode, rtext = _test_anthropic_key(key)
                 else:
                     rcode, rtext = _test_openrouter_key(key)
-                if rcode == 200 or rcode == 201:
+
+                if rcode in (200, 201):
                     messagebox.showinfo("Key OK", f"Key is valid for {provider} (HTTP {rcode}).")
                 else:
-                    messagebox.showerror("Key Test Failed", f"HTTP {rcode}: {rtext}")
+                    hint = _provider_hint(key, provider)
+                    extra = "\n\n" + hint if hint else ""
+                    if rcode == 0 and ("Failed to resolve" in rtext or "Name or service not known" in rtext or "getaddrinfo failed" in rtext):
+                        extra += "\n\nNetwork error: unable to resolve api.openrouter.ai. Check your DNS or internet connection."
+                    messagebox.showerror("Key Test Failed", f"HTTP {rcode}: {rtext}{extra}")
             except Exception as e:
                 messagebox.showerror("Key Test Error", str(e))
             finally:
@@ -259,8 +271,10 @@ class ChatWindow(tk.Toplevel):
         try:
             if self.provider == "openai":
                 reply = call_openai_chat(self.api_key, self.system_instruction, user_text)
-            else:
+            elif self.provider == "anthropic":
                 reply = call_anthropic(self.api_key, self.system_instruction, user_text)
+            else:
+                reply = call_openrouter(self.api_key, self.system_instruction, user_text)
         except Exception as e:
             reply = f"Error calling API: {e}"
 
