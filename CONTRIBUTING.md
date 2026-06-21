@@ -4,8 +4,8 @@ Thanks for helping improve `languageFUCK`! This repo is a lightweight playground
 
 ## Getting started
 
-1. Fork the repo on GitHub.
-2. Clone your fork locally:
+1. fork the repo on GitHub.
+2. clone your fork locally:
 
 ```powershell
 git clone https://github.com/<your-username>/languageFUCK.git

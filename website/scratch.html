@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>languageFUCK — microtoy</title>
+  <style>
+    :root{--bg:#0b0f14;--accent:#39ffea;--muted:#7fd6d1}
+    html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    body{background:linear-gradient(160deg,#071018 0%,#0b0f14 60%);color:var(--accent);display:flex;align-items:center;justify-content:center}
+    .card{width:min(860px,94vw);padding:28px;border-radius:12px;background:rgba(255,255,255,0.02);box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04)}
+    h1{margin:0 0 6px;font-size:1.6rem;color:var(--accent)}
+    p{margin:0 0 18px;color:var(--muted)}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    button{appearance:none;border:0;padding:10px 14px;border-radius:8px;background:linear-gradient(90deg,#0ff 60%,#6ff);color:#022;cursor:pointer;font-weight:700}
+    .name{margin-top:18px;padding:18px;border-radius:10px;background:rgba(0,0,0,0.3);font-family:monospace;font-size:1.2rem}
+    .glitch{position:relative;color:var(--accent)}
+    .glitch::after{content:attr(data-text);position:absolute;left:2px;top:0;color:#ff77c7;mix-blend-mode:screen;opacity:0.7;clip-path:polygon(0 0,100% 0,100% 65%,0 65%);transform:translateX(-2px)}
+    footer{margin-top:18px;color:#6fbfb9;font-size:.85rem}
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <h1 class="glitch" data-text="languageFUCK microtoy">languageFUCK microtoy</h1>
+    <p>Just a tiny HTML toy — generates random silly language names and shows small visual effects. Not part of the repo website.</p>
+
+    <div class="row">
+      <button id="gen">Generate name</button>
+      <button id="spin">Toggle spin</button>
+      <button id="copy">Copy</button>
+    </div>
+
+    <div id="name" class="name">— click "Generate name" —</div>
+
+    <footer>Try it: generate, spin the output, or copy to clipboard.</footer>
+  </div>
+
+  <script>
+    const syllables = ["bomb", "toilet", "shart", "bark", "fart", "shit", "ship", "fuck", "lang", "vo", "sigma", "fuck", "byte", "flux", "murm", "quip", "lore", "nep", "zin", "meta", "cli", "glo", "node", "arc", "vex", "tor", "rix", "sol", "pam", "zen", "quix", "bra", "tri", "hex", "omn", "lyr", "syl", "vox", "nix", "rum", "dak", "zer", "kil", "mun", "phaz", "tal", "ori", "bex"]
+    const genBtn = document.getElementById('gen')
+    const spinBtn = document.getElementById('spin')
+    const copyBtn = document.getElementById('copy')
+    const out = document.getElementById('name')
+    let spinning = false
+
+    function rand(n){return Math.floor(Math.random()*n)}
+    function makeName(){
+      const parts = 2 + rand(3)
+      let name = ''
+      for(let i=0;i<parts;i++){
+        let s = syllables[rand(syllables.length)]
+        if(i===0) s = s.charAt(0).toUpperCase()+s.slice(1)
+        name += (i?'-':'') + s
+      }
+      // probabilistic twist
+      if(Math.random()<0.18) name += '.' + (100+rand(900))
+      return name
+    }
+
+    genBtn.addEventListener('click',()=>{
+      out.textContent = makeName()
+      out.style.transform = 'scale(1.03)'
+      setTimeout(()=>out.style.transform='scale(1)',180)
+    })
+
+    spinBtn.addEventListener('click',()=>{
+      spinning = !spinning
+      if(spinning){
+        out.style.transition = 'transform 0.6s linear'
+        out.style.transform = 'rotate(0deg)'
+        out.animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:2000,iterations:Infinity})
+        spinBtn.textContent = 'Stop spin'
+      } else {
+        // stop by forcing computed style
+        out.style.transform = 'none'
+        out.getAnimations().forEach(a=>a.cancel())
+        spinBtn.textContent = 'Toggle spin'
+      }
+    })
+
+    copyBtn.addEventListener('click',async()=>{
+      try{ await navigator.clipboard.writeText(out.textContent || '')
+        copyBtn.textContent='Copied!'
+        setTimeout(()=>copyBtn.textContent='Copy',900)
+      }catch(e){ copyBtn.textContent='Fail'; setTimeout(()=>copyBtn.textContent='Copy',900)}
+    })
+  </script>
+</body>
+</html>
