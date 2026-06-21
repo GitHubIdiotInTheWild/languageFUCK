@@ -234,45 +234,34 @@ class ApiKeyPrompt(tk.Tk):
 
         def do_test():
             try:
-                api_host = "api.openrouter.ai"
-                website_host = "openrouter.ai"
+                results = []
+                for host, path in _openrouter_candidates():
+                    try:
+                        resolved = socket.gethostbyname(host)
+                        url = f"https://{host}{path}"
+                        try:
+                            r = requests.get(url, timeout=10)
+                            results.append((host, path, resolved, r.status_code, None))
+                        except Exception as conn_err:
+                            results.append((host, path, resolved, None, str(conn_err)))
+                    except Exception as dns_err:
+                        results.append((host, path, None, None, str(dns_err)))
 
-                api_resolved = None
-                website_resolved = None
-                try:
-                    api_resolved = socket.gethostbyname(api_host)
-                except Exception as api_err:
-                    api_err_text = str(api_err)
-                try:
-                    website_resolved = socket.gethostbyname(website_host)
-                except Exception:
-                    website_resolved = None
-
-                if not api_resolved:
-                    if website_resolved:
-                        messagebox.showerror(
-                            "Network Test Failed",
-                            f"DNS for {api_host} failed, but {website_host} resolved to {website_resolved}.\n" \
-                            f"Note: {website_host} is the website host, not the OpenRouter API host.\n" \
-                            "Please fix DNS or use a network/VPN that resolves api.openrouter.ai."
-                        )
-                    else:
-                        messagebox.showerror(
-                            "Network Test Failed",
-                            f"DNS resolution failed for both {api_host} and {website_host}.\n" \
-                            "Please check your DNS or network settings."
-                        )
-                    return
-
-                msg = f"DNS resolved {api_host} -> {api_resolved}."
-                try:
-                    r = requests.get(f"https://{api_host}/v1/chat/completions", timeout=10)
-                    if r.status_code in (200, 401, 403, 404):
-                        messagebox.showinfo("Network Test", f"{msg} HTTP {r.status_code} returned from {api_host}.")
-                    else:
-                        messagebox.showinfo("Network Test", f"{msg} Host reachable, but HTTP {r.status_code} returned.")
-                except Exception as conn_err:
-                    messagebox.showerror("Network Test Failed", f"{msg} Unable to connect to {api_host}: {conn_err}")
+                success = [r for r in results if r[3] is not None]
+                if success:
+                    messages = [
+                        f"{host}{path} resolved to {resolved}, HTTP {status}" if status is not None else f"{host}{path} resolved to {resolved}, connection failed: {err}"
+                        for host, path, resolved, status, err in success
+                    ]
+                    messagebox.showinfo("Network Test", "\n".join(messages))
+                else:
+                    message = []
+                    for host, path, resolved, status, err in results:
+                        if resolved is None:
+                            message.append(f"{host}{path}: DNS failed ({err})")
+                        else:
+                            message.append(f"{host}{path}: resolved {resolved}, connection failed ({err})")
+                    messagebox.showerror("Network Test Failed", "\n".join(message))
             finally:
                 try:
                     self.status.config(text="")
@@ -402,19 +391,26 @@ def call_anthropic(api_key, system_instruction, user_text):
     return json.dumps(data)
 
 
+def _openrouter_candidates():
+    return [
+        ("api.openrouter.ai", "/v1/chat/completions"),
+        ("openrouter.ai", "/api/v1/chat/completions"),
+        ("openrouter.ai", "/v1/chat/completions"),
+        ("api.openrouter.ai", "/api/v1/chat/completions"),
+    ]
+
+
 def _choose_openrouter_host():
-    try:
-        socket.gethostbyname("api.openrouter.ai")
-        return "api.openrouter.ai"
-    except Exception:
-        return None
+    for host, _ in _openrouter_candidates():
+        try:
+            socket.gethostbyname(host)
+            return host
+        except Exception:
+            continue
+    return None
 
 
 def call_openrouter(api_key, system_instruction, user_text):
-    host = _choose_openrouter_host()
-    if not host:
-        raise RuntimeError("OpenRouter API host api.openrouter.ai could not be resolved. Please check your DNS or network settings.")
-    url = f"https://{host}/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
         "model": "gpt-4o-mini",
@@ -425,12 +421,23 @@ def call_openrouter(api_key, system_instruction, user_text):
         "temperature": 0.2,
         "max_tokens": 2000
     }
-    r = requests.post(url, headers=headers, json=payload, timeout=60)
-    r.raise_for_status()
-    data = r.json()
-    if "choices" in data and len(data["choices"])>0:
-        return data["choices"][0].get("message", {}).get("content", "").strip()
-    return json.dumps(data)
+    errors = []
+    for host, path in _openrouter_candidates():
+        url = f"https://{host}{path}"
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=60)
+            if r.status_code == 404:
+                errors.append(f"{url} -> 404")
+                continue
+            r.raise_for_status()
+            data = r.json()
+            if "choices" in data and len(data["choices"]) > 0:
+                return data["choices"][0].get("message", {}).get("content", "").strip()
+            return json.dumps(data)
+        except requests.exceptions.RequestException as e:
+            errors.append(f"{url} -> {e}")
+            continue
+    raise RuntimeError("OpenRouter call failed. Tried: " + "; ".join(errors))
 
 
 def _test_openai_key(key):
@@ -460,19 +467,21 @@ def _test_anthropic_key(key):
 
 
 def _test_openrouter_key(key):
-    try:
-        host = _choose_openrouter_host()
-        if not host:
-            return 0, "OpenRouter API host api.openrouter.ai could not be resolved."
-        r = requests.post(
-            f"https://{host}/v1/chat/completions",
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={"model":"gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":3},
-            timeout=10
-        )
-        return r.status_code, r.text
-    except Exception as e:
-        return 0, str(e)
+    headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    payload = {"model":"gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":3}
+    errors = []
+    for host, path in _openrouter_candidates():
+        url = f"https://{host}{path}"
+        try:
+            r = requests.post(url, headers=headers, json=payload, timeout=10)
+            if r.status_code == 404:
+                errors.append(f"{url} -> 404")
+                continue
+            return r.status_code, r.text
+        except Exception as e:
+            errors.append(f"{url} -> {e}")
+            continue
+    return 0, "OpenRouter key test failed. Tried: " + "; ".join(errors)
 
 
 class SpecWindow(tk.Toplevel):
