@@ -3,3 +3,4 @@ C:\Users\HP\AppData\Roaming\r2modmanPlus-local\coinpunch\languageFUCK\AmongUs\ob
 C:\Users\HP\AppData\Roaming\r2modmanPlus-local\coinpunch\languageFUCK\AmongUs\obj\Debug\netstandard2.1\hostrole.AssemblyInfo.cs
 C:\Users\HP\AppData\Roaming\r2modmanPlus-local\coinpunch\languageFUCK\AmongUs\obj\Debug\netstandard2.1\hostrole.csproj.CoreCompileInputs.cache
 C:\Users\HP\AppData\Roaming\r2modmanPlus-local\coinpunch\languageFUCK\AmongUs\obj\Debug\netstandard2.1\hostrole.sourcelink.json
+C:\Users\HP\AppData\Roaming\r2modmanPlus-local\coinpunch\languageFUCK\AmongUs\obj\Debug\netstandard2.1\hostrole.csproj.AssemblyReference.cache

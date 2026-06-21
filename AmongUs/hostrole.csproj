@@ -14,8 +14,9 @@
     <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\BepInEx.IL2CPP.dll" Private="false" />
     <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\0Harmony.dll" Private="false" />
     
-    <Reference Include="D:\SteamLibrary\steamapps\common\Among Us\Among Us_Data\Managed\Assembly-CSharp.dll" Private="false" />
-    <Reference Include="D:\SteamLibrary\steamapps\common\Among Us\Among Us_Data\Managed\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Il2CppSystem.dll" Private="false" />
   </ItemGroup>
 
 </Project>

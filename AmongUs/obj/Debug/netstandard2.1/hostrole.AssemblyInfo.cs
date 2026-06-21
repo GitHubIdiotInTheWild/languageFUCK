@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Host Role Override Mod")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6dfb3d8b1d7dc4ac1d45692689a61b35ae40438d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+50b115a3d6120355996b1d478f04d8e843a0a4fa")]
 [assembly: System.Reflection.AssemblyProductAttribute("AmongUsHostOverride")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AmongUsHostOverride")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
