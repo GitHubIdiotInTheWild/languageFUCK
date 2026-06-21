@@ -13,6 +13,12 @@ INPUT_BG = "#1E1E1E"
 INPUT_FG = "#FFFFFF"
 
 
+def _choose_font(size, weight="normal"):
+    family = next((f for f in tkfont.families() if "merriweather" in f.lower()), None)
+    if family:
+        return tkfont.Font(family=family, size=size, weight=weight)
+    return tkfont.Font(family="Segoe UI", size=size, weight=weight)
+
 class ApiKeyPrompt(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -154,6 +160,11 @@ class ChatWindow(tk.Toplevel):
         self.title("AI Coding Assistant")
         self.configure(bg=BACKGROUND)
         self.geometry("900x700")
+        # Fonts (use module helper so ChatWindow has fonts independent of ApiKeyPrompt)
+        self.header_font = _choose_font(22, "bold")
+        self.body_font = _choose_font(14)
+        self.small_font = _choose_font(11)
+        self.button_font = _choose_font(13, "bold")
 
         # System instruction to always return full code
         self.system_instruction = (
