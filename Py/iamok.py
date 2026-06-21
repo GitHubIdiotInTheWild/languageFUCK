@@ -46,7 +46,8 @@ def is_pi_equation(text):
     if not isinstance(left_value, (int, float)) or not isinstance(right_value, (int, float)):
         return False
 
-    return abs(left_value - right_value) < 1e-9
+    # Accept approximate values like 3.14 for pi, or 4.14 for pi + 1
+    return abs(left_value - right_value) < 0.01
 
 
 def on_type(event=None):
