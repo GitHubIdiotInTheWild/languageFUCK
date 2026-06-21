@@ -1,6 +1,8 @@
 # languageFUCK
 
-small experimental repo containing a LOT of random code so i can learn every language (in a basic manner)
+A playful, experimental repo for learning languages and building tiny code experiments. This project collects small tools, demos, and GUIs across Python, Lua, and more so you can explore concepts quickly without getting stuck in a large framework.
+
+# languageFUCK's features
 
 ## Structure
 
