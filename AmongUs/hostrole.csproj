@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>AmongUsHostOverride</AssemblyName>
+    <Description>Host Role Override Mod</Description>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>latest</LangVersion>
+    
+    <AmongUsPath>C:\Program Files (x86)\Steam\steamapps\common\Among Us</AmongUsPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="$(AmongUsPath)\BepInEx\core\BepInEx.Core.dll" Private="false" />
+    <Reference Include="$(AmongUsPath)\BepInEx\core\BepInEx.IL2CPP.dll" Private="false" />
+    <Reference Include="$(AmongUsPath)\BepInEx\core\0Harmony.dll" Private="false" />
+    <Reference Include="$(AmongUsPath)\Among Us_Data\Managed\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="$(AmongUsPath)\Among Us_Data\Managed\UnityEngine.CoreModule.dll" Private="false" />
+  </ItemGroup>
+
+</Project>
