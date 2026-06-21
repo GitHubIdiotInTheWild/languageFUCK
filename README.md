@@ -1,4 +1,68 @@
 # languageFUCK
 
-plase kill me i dont want to do this shit iae9xcvui  mi  i s jkasjkls *i swear a lot* (FUCK ME) ~Kill yourself and also me before it~ AAAAAAAAAAAAAAAAAAAAH **FUCKKKKKKKKKKKKKKKKKK**
-I HATE THIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIISSSSSSSS GET ME OUT OF MY ROOM IM BEING KIDNAPPED
+small experimental repo containing a LOT of random code so i can learn every language (in a basic manner)
+
+## Structure
+
+- `Py/something.py` — dark Tkinter UI for entering an API key selecting a provider and chatting with models
+- `Py/iamok.py` — math-based close condition
+- ~`Py/openaitesting.py` — example request script for OpenRouter/OpenAI-style APIs~
+- `lua/bob.lua` — simple text adventure game written in Lua useful for learning the language
+- ~`MD/`~ `does this even count/` — markdown notes and scratch files
+- `lua/yes.lua` — i honestly forgot
+
+## Requirements
+
+- Python 3.11 - 3.14 with `requests` installed
+- Lua runtime for `lua/bob.lua`
+
+## Setup
+
+### Python
+
+Install `requests`:
+
+```powershell
+py -m pip install requests
+```
+
+### Lua
+
+If Lua is not available on `PATH`, run the game with the full executable path:
+
+```powershell
+C:\Users\HP\Downloads\lua\lua55.exe lua\bob.lua
+```
+
+If you have `lua.exe` on `PATH`, run:
+
+```powershell
+lua lua\bob.lua
+```
+
+## Usage
+
+### Run the assistant UI
+
+```powershell
+py Py\something.py
+```
+
+### Run the Lua learning game
+
+```powershell
+lua55.exe lua\bob.lua
+```
+
+or if `lua` is available:
+
+```powershell
+lua lua\bob.lua
+```
+
+## Notes
+
+- The assistant supports OpenAI, Anthropic, and OpenRouter providers.
+- The Lua game is a beginner-friendly demo that shows tables, functions, and game state.
+- Pull new changes after a PR is merged with `git pull`.
+
