@@ -16,15 +16,28 @@ class ApiKeyPrompt(tk.Tk):
         self.configure(bg=BACKGROUND)
         self.state("zoomed")
         self.resizable(False, False)
+        self._build_ui()
 
+    def _choose_font(self, size, weight="normal"):
+        family = next((f for f in tkfont.families() if "merriweather" in f.lower()), None)
+        if family:
+            return tkfont.Font(family=family, size=size, weight=weight)
+        return tkfont.Font(family="Segoe UI", size=size, weight=weight)
+
+    def _build_ui(self):
         self.columnconfigure(0, weight=1)
+
+        self.header_font = self._choose_font(22, "bold")
+        self.body_font = self._choose_font(14)
+        self.small_font = self._choose_font(11)
+        self.button_font = self._choose_font(13, "bold")
 
         self.header = tk.Label(
             self,
             text="Welcome",
             fg=FOREGROUND,
             bg=BACKGROUND,
-            font=("Merriweather", 22, "bold") if "Merriweather" in tkfont.families() else ("Segoe UI", 22, "bold")
+            font=self.header_font
         )
         self.header.grid(row=0, column=0, pady=(20, 8), sticky="n")
 
@@ -33,7 +46,7 @@ class ApiKeyPrompt(tk.Tk):
             text="Enter your API key to continue",
             fg="#B0B0B0",
             bg=BACKGROUND,
-            font=("Merriweather", 14) if "Merriweather" in tkfont.families() else ("Segoe UI", 14)
+            font=self.body_font
         )
         self.subheader.grid(row=1, column=0, pady=(0, 20), sticky="n")
 
@@ -45,7 +58,7 @@ class ApiKeyPrompt(tk.Tk):
         self.api_entry = tk.Entry(
             self.input_frame,
             textvariable=self.api_var,
-            font=("Merriweather", 14) if "Merriweather" in tkfont.families() else ("Segoe UI", 14),
+            font=self.body_font,
             fg=INPUT_FG,
             bg=INPUT_BG,
             insertbackground=INPUT_FG,
@@ -62,7 +75,7 @@ class ApiKeyPrompt(tk.Tk):
             text="Your key is stored only in this session.",
             fg="#7A7A7A",
             bg=BACKGROUND,
-            font=("Merriweather", 11) if "Merriweather" in tkfont.families() else ("Segoe UI", 11)
+            font=self.small_font
         )
         self.hint.grid(row=3, column=0, pady=(0, 16))
 
@@ -74,7 +87,7 @@ class ApiKeyPrompt(tk.Tk):
             bg=ACCENT,
             activebackground="#4A62D7",
             activeforeground=FOREGROUND,
-            font=("Merriweather", 13, "bold") if "Merriweather" in tkfont.families() else ("Segoe UI", 13, "bold"),
+            font=self.button_font,
             relief="flat",
             bd=0,
             padx=16,
@@ -88,7 +101,7 @@ class ApiKeyPrompt(tk.Tk):
             text="",
             fg="#FF5F5F",
             bg=BACKGROUND,
-            font=("Merriweather", 11) if "Merriweather" in tkfont.families() else ("Segoe UI", 11)
+            font=self.small_font
         )
         self.status.grid(row=5, column=0, pady=(12, 0))
 
