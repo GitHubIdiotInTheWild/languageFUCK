@@ -234,26 +234,45 @@ class ApiKeyPrompt(tk.Tk):
 
         def do_test():
             try:
-                host = _choose_openrouter_host()
-                if not host:
-                    messagebox.showerror("Network Test Failed", "No OpenRouter host could be resolved.")
+                api_host = "api.openrouter.ai"
+                website_host = "openrouter.ai"
+
+                api_resolved = None
+                website_resolved = None
+                try:
+                    api_resolved = socket.gethostbyname(api_host)
+                except Exception as api_err:
+                    api_err_text = str(api_err)
+                try:
+                    website_resolved = socket.gethostbyname(website_host)
+                except Exception:
+                    website_resolved = None
+
+                if not api_resolved:
+                    if website_resolved:
+                        messagebox.showerror(
+                            "Network Test Failed",
+                            f"DNS for {api_host} failed, but {website_host} resolved to {website_resolved}.\n" \
+                            f"Note: {website_host} is the website host, not the OpenRouter API host.\n" \
+                            "Please fix DNS or use a network/VPN that resolves api.openrouter.ai."
+                        )
+                    else:
+                        messagebox.showerror(
+                            "Network Test Failed",
+                            f"DNS resolution failed for both {api_host} and {website_host}.\n" \
+                            "Please check your DNS or network settings."
+                        )
                     return
 
+                msg = f"DNS resolved {api_host} -> {api_resolved}."
                 try:
-                    resolved = socket.gethostbyname(host)
-                    msg = f"DNS resolved {host} -> {resolved}."
-                except Exception as dns_err:
-                    messagebox.showerror("Network Test Failed", f"DNS resolution failed for {host}: {dns_err}")
-                    return
-
-                try:
-                    r = requests.get(f"https://{host}/v1/chat/completions", timeout=10)
+                    r = requests.get(f"https://{api_host}/v1/chat/completions", timeout=10)
                     if r.status_code in (200, 401, 403, 404):
-                        messagebox.showinfo("Network Test", f"{msg} HTTP {r.status_code} returned from {host}.")
+                        messagebox.showinfo("Network Test", f"{msg} HTTP {r.status_code} returned from {api_host}.")
                     else:
                         messagebox.showinfo("Network Test", f"{msg} Host reachable, but HTTP {r.status_code} returned.")
                 except Exception as conn_err:
-                    messagebox.showerror("Network Test Failed", f"{msg} Unable to connect to {host}: {conn_err}")
+                    messagebox.showerror("Network Test Failed", f"{msg} Unable to connect to {api_host}: {conn_err}")
             finally:
                 try:
                     self.status.config(text="")
@@ -384,17 +403,17 @@ def call_anthropic(api_key, system_instruction, user_text):
 
 
 def _choose_openrouter_host():
-    for host in ["api.openrouter.ai", "openrouter.ai"]:
-        try:
-            socket.gethostbyname(host)
-            return host
-        except Exception:
-            continue
-    return "api.openrouter.ai"
+    try:
+        socket.gethostbyname("api.openrouter.ai")
+        return "api.openrouter.ai"
+    except Exception:
+        return None
 
 
 def call_openrouter(api_key, system_instruction, user_text):
     host = _choose_openrouter_host()
+    if not host:
+        raise RuntimeError("OpenRouter API host api.openrouter.ai could not be resolved. Please check your DNS or network settings.")
     url = f"https://{host}/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
@@ -443,6 +462,8 @@ def _test_anthropic_key(key):
 def _test_openrouter_key(key):
     try:
         host = _choose_openrouter_host()
+        if not host:
+            return 0, "OpenRouter API host api.openrouter.ai could not be resolved."
         r = requests.post(
             f"https://{host}/v1/chat/completions",
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
