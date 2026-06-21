@@ -8,3 +8,19 @@
 - [ ] maybe among us mods with csharp
 - [ ] improve ai assistant (something.py)
 - [ ] 40+ commits
+
+# code snippets
+
+## js
+
+```js
+const message = "Hello world";
+console.log(message)
+```
+
+## python
+
+```python
+def greet(name):
+  return f"Hello, {name}!"
+```
