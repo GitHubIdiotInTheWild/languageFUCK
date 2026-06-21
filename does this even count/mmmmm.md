@@ -10,4 +10,4 @@
 
 - build a small `random-snippet` generator.
 - ~make something involving AI review (funny)~
-- keep language experiment notes in one place, here
+- ~keep language experiment notes in one place, here~
