@@ -1,3 +1,4 @@
+import socket
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import messagebox
@@ -155,7 +156,24 @@ class ApiKeyPrompt(tk.Tk):
             pady=6,
             cursor="hand2"
         )
-        self.test_button.grid(row=8, column=0, padx=160, pady=(8,0), sticky="ew")
+        self.test_button.grid(row=8, column=0, padx=70, pady=(8,0), sticky="ew")
+
+        self.net_button = tk.Button(
+            self,
+            text="Network Test",
+            command=self.test_network,
+            fg=FOREGROUND,
+            bg="#5C7AEA",
+            activebackground="#4865C9",
+            activeforeground=FOREGROUND,
+            font=self.small_font,
+            relief="flat",
+            bd=0,
+            padx=12,
+            pady=6,
+            cursor="hand2"
+        )
+        self.net_button.grid(row=9, column=0, padx=120, pady=(8,0), sticky="ew")
 
     def on_submit(self):
         key = self.api_var.get().strip()
@@ -203,6 +221,39 @@ class ApiKeyPrompt(tk.Tk):
                     messagebox.showerror("Key Test Failed", f"HTTP {rcode}: {rtext}{extra}")
             except Exception as e:
                 messagebox.showerror("Key Test Error", str(e))
+            finally:
+                try:
+                    self.status.config(text="")
+                except Exception:
+                    pass
+
+        threading.Thread(target=do_test, daemon=True).start()
+
+    def test_network(self):
+        self.status.config(text="Checking network...")
+
+        def do_test():
+            try:
+                host = _choose_openrouter_host()
+                if not host:
+                    messagebox.showerror("Network Test Failed", "No OpenRouter host could be resolved.")
+                    return
+
+                try:
+                    resolved = socket.gethostbyname(host)
+                    msg = f"DNS resolved {host} -> {resolved}."
+                except Exception as dns_err:
+                    messagebox.showerror("Network Test Failed", f"DNS resolution failed for {host}: {dns_err}")
+                    return
+
+                try:
+                    r = requests.get(f"https://{host}/v1/chat/completions", timeout=10)
+                    if r.status_code in (200, 401, 403, 404):
+                        messagebox.showinfo("Network Test", f"{msg} HTTP {r.status_code} returned from {host}.")
+                    else:
+                        messagebox.showinfo("Network Test", f"{msg} Host reachable, but HTTP {r.status_code} returned.")
+                except Exception as conn_err:
+                    messagebox.showerror("Network Test Failed", f"{msg} Unable to connect to {host}: {conn_err}")
             finally:
                 try:
                     self.status.config(text="")
@@ -332,8 +383,19 @@ def call_anthropic(api_key, system_instruction, user_text):
     return json.dumps(data)
 
 
+def _choose_openrouter_host():
+    for host in ["api.openrouter.ai", "openrouter.ai"]:
+        try:
+            socket.gethostbyname(host)
+            return host
+        except Exception:
+            continue
+    return "api.openrouter.ai"
+
+
 def call_openrouter(api_key, system_instruction, user_text):
-    url = "https://api.openrouter.ai/v1/chat/completions"
+    host = _choose_openrouter_host()
+    url = f"https://{host}/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     payload = {
         "model": "gpt-4o-mini",
@@ -380,8 +442,9 @@ def _test_anthropic_key(key):
 
 def _test_openrouter_key(key):
     try:
+        host = _choose_openrouter_host()
         r = requests.post(
-            "https://api.openrouter.ai/v1/chat/completions",
+            f"https://{host}/v1/chat/completions",
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
             json={"model":"gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":3},
             timeout=10
