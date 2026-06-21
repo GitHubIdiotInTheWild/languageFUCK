@@ -171,8 +171,12 @@ class ChatWindow(tk.Toplevel):
 
         self.input_entry = tk.Entry(entry_frame, font=self.body_font)
         self.input_entry.pack(side="left", fill="x", expand=True, ipady=8, padx=(0, 8))
-        self.send_button = tk.Button(entry_frame, text="Send", command=self.on_send, bg=ACCENT, fg=FOREGROUND, relief="flat")
-        self.send_button.pack(side="right")
+        buttons_frame = tk.Frame(entry_frame, bg=BACKGROUND)
+        buttons_frame.pack(side="right")
+        self.send_button = tk.Button(buttons_frame, text="Send", command=self.on_send, bg=ACCENT, fg=FOREGROUND, relief="flat")
+        self.send_button.pack(side="left", padx=(0, 6))
+        self.make_button = tk.Button(buttons_frame, text="Make", command=self.open_spec_window, bg="#FFB86C", fg=FOREGROUND, relief="flat")
+        self.make_button.pack(side="left")
 
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -207,6 +211,9 @@ class ChatWindow(tk.Toplevel):
         # destroy and clear any in-memory keys
         self.api_key = None
         self.destroy()
+
+    def open_spec_window(self):
+        SpecWindow(self)
 
 
 def call_openai_chat(api_key, system_instruction, user_text):
@@ -250,6 +257,43 @@ def call_anthropic(api_key, system_instruction, user_text):
     if "completions" in data and len(data["completions"])>0:
         return data["completions"][0].get("data", {}).get("text", "").strip()
     return json.dumps(data)
+
+
+class SpecWindow(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent = parent
+        self.title("Make - Project Spec")
+        self.configure(bg=BACKGROUND)
+        self.geometry("700x460")
+
+        lbl = tk.Label(self, text="Describe what you want (include language, files, behavior):", fg=FOREGROUND, bg=BACKGROUND, font=parent.small_font)
+        lbl.pack(padx=12, pady=(12, 6), anchor="w")
+
+        self.text = tk.Text(self, height=14, bg="#0F0F0F", fg=FOREGROUND)
+        self.text.pack(fill="both", expand=True, padx=12, pady=(0, 12))
+
+        bottom = tk.Frame(self, bg=BACKGROUND)
+        bottom.pack(fill="x", padx=12, pady=(0, 12))
+
+        tk.Label(bottom, text="Language:", fg=FOREGROUND, bg=BACKGROUND, font=parent.small_font).pack(side="left")
+        self.lang_var = tk.StringVar(value="python")
+        lang_menu = ttk.OptionMenu(bottom, self.lang_var, "python", "python", "javascript", "java", "typescript", "lua")
+        lang_menu.pack(side="left", padx=(6, 12))
+
+        gen_btn = tk.Button(bottom, text="Generate", command=self.on_generate, bg=ACCENT, fg=FOREGROUND, relief="flat")
+        gen_btn.pack(side="right")
+
+    def on_generate(self):
+        spec = self.text.get("1.0", "end").strip()
+        lang = self.lang_var.get()
+        if not spec:
+            messagebox.showinfo("Empty spec", "Please write what you want.")
+            return
+        prompt = f"Generate a complete, runnable {lang} project. Provide full source files and any instructions. Spec:\n{spec}"
+        self.parent.append_chat("User", f"[Make] {spec}")
+        threading.Thread(target=self.parent.call_model, args=(prompt,), daemon=True).start()
+        self.destroy()
 
 
 if __name__ == "__main__":
