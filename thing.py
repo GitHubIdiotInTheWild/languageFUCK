@@ -35,7 +35,7 @@ def start_farming():
         status_label.configure(text="⚡ Farming in progress...", text_color="#ff9900")
         log_box.configure(state="normal")
         log_box.delete("1.0", "end")
-        log_box.insert("end", f" >>> Launching high-speed commit sequence: targeting {count} iterations...\n\n")
+        log_box.insert("end", f" >>> Launching batch-optimized commit sequence: targeting {count} iterations...\n\n")
         root.update()
         
         progress_bar.set(0)
@@ -47,21 +47,17 @@ def start_farming():
             with open("green_farm.txt", "w") as f:
                 f.write(f"CustomGUI Farm Pack: {i}\n")
                 
-            # SAFE SPEED HACK: subprocess.run ensures Windows safely cycles handles 
-            # without running out of system memory, while keeping it lightning fast.
+            # Safe sequential execution
             subprocess.run(["git", "add", "green_farm.txt"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.run(["git", "commit", "-m", f"GUI Turbo Pack #{i}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             
-            # Update GUI progress bar math
-            target_progress = current_step / count
-            progress_bar.set(target_progress)
-            
-            # Console logs
-            log_box.insert("end", f"[DEPLOYED] Commit #{current_step}/{count}\n")
-            log_box.see("end")
-            
-            # Batch UI updates to keep performance smooth
-            if current_step % 5 == 0 or current_step == count:
+            # BATCH SPEED UPDATE: Only refresh the interface on larger intervals
+            if current_step % 50 == 0 or current_step == count:
+                target_progress = current_step / count
+                progress_bar.set(target_progress)
+                
+                log_box.insert("end", f"[BATCH DONE] Successfully deployed up to #{current_step}/{count}\n")
+                log_box.see("end")
                 root.update()
             
         # Update Stats
@@ -134,7 +130,7 @@ progress_bar = ctk.CTkProgressBar(
 progress_bar.set(0)
 progress_bar.pack(pady=10)
 
-# Status Label (Fixed 'slant' keyword argument)
+# Status Label
 status_label = ctk.CTkLabel(
     root, 
     text="Ready to launch", 
