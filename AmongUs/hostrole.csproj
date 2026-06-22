@@ -2,21 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>AmongUsHostOverride</AssemblyName>
-    <Description>Host Role Override Mod</Description>
+    <AssemblyName>hostrole</AssemblyName>
+    <RootNamespace>hostrole</RootNamespace>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
+    <NoWarn>MSB3277;MSB3245</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\BepInEx.Core.dll" Private="false" />
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\BepInEx.IL2CPP.dll" Private="false" />
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\0Harmony.dll" Private="false" />
-    
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Assembly-CSharp.dll" Private="false" />
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\UnityEngine.CoreModule.dll" Private="false" />
-    <Reference Include="C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Il2CppSystem.dll" Private="false" />
+    <Reference Include="BepInEx.Core">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\BepInEx.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Unity.IL2CPP">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\core\Il2CppInterop.Runtime.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>C:\Users\HP\AppData\Roaming\r2modmanPlus-local\AmongUs\profiles\Default\BepInEx\interop\Il2CppSystem.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
