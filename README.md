@@ -13,6 +13,7 @@ this repo is designed both as a personal scratchpad and as a lightweight learnin
 - `Py/something.py` — dark Tkinter UI for entering an API key selecting a provider and chatting with models
 - `Py/iamok.py` — math-based close condition
 - ~`Py/openaitesting.py` — example request script for OpenRouter/OpenAI-style APIs~
+- `Py/fakestocks.py` (or whatever the name was) — Google Finance but you get to paint it
 - `lua/bob.lua` — simple text adventure game written in Lua useful for learning the language
 - ~`MD/`~ `does this even count/` — markdown notes and scratch files
 - `lua/yes.lua` — i honestly forgot
